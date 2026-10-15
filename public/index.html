@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>余裕があれば記述式に挑戦！（社会）</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Maru+Gothic:wght@500;700&display=swap">
+<style>
+/* Layout: 1カラムのノート型。上に「書き方の3か条」、下に定番／高得点ねらいの2タブ。各問は 問い→図→記入欄→答え合わせ の縦並び */
+:root{
+  --font-display:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
+  --font-body:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
+  --bg:#EDF2F4; --surface:#FFFFFF; --surface-2:#F4F8F9; --ink:#14252E; --muted:#4F646D; --line:#C9D6DB;
+  --accent:#0B6B70; --accent-ink:#FFFFFF; --accent-soft:#D5ECED;
+  --mark:#FFC4D8; --ok:#17794A; --ok-soft:#D7EFE2;
+  --glass:#DCEBF1; --water:#A9D6EA; --ethanol:#EFE6B8; --leaf:#3E9B4F; --leaf-pale:#DCE8C8;
+  --flame:#F2A01D; --powder:#FFFFFF; --sponge:#E8C46A; --metal:#B8C2C8; --blue:#2F6FD0; --yellow:#E3C938;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1A20; --surface:#16262D; --surface-2:#1B2D35; --ink:#E5EFF2; --muted:#9BB1B9; --line:#2B414A;
+    --accent:#52C2C6; --accent-ink:#052A2C; --accent-soft:#12393C;
+    --mark:#7A2D4B; --ok:#62D192; --ok-soft:#143A27;
+    --glass:#223D49; --water:#2A5C75; --ethanol:#5A5430; --leaf:#4DB25F; --leaf-pale:#6D7B55;
+    --flame:#F2A01D; --powder:#E8E4D6; --sponge:#B8923A; --metal:#5F6F77; --blue:#5B92EA; --yellow:#E8CF45;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1A20; --surface:#16262D; --surface-2:#1B2D35; --ink:#E5EFF2; --muted:#9BB1B9; --line:#2B414A;
+  --accent:#52C2C6; --accent-ink:#052A2C; --accent-soft:#12393C;
+  --mark:#7A2D4B; --ok:#62D192; --ok-soft:#143A27;
+  --glass:#223D49; --water:#2A5C75; --ethanol:#5A5430; --leaf:#4DB25F; --leaf-pale:#6D7B55;
+  --flame:#F2A01D; --powder:#E8E4D6; --sponge:#B8923A; --metal:#5F6F77; --blue:#5B92EA; --yellow:#E8CF45;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:16px; line-height:1.85;
+  padding-block:20px 56px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap{max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:22px;min-width:0}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.mk{background:linear-gradient(transparent 58%, var(--mark) 58%)}
+rt{font-size:.55em;font-weight:500}
+
+.top{display:flex;flex-direction:column;gap:6px}
+.back{font-size:14px}
+.eyebrow{font-size:13px;letter-spacing:.14em;color:var(--muted);font-weight:700}
+h1{font-family:var(--font-display);font-size:clamp(30px,8vw,40px);line-height:1.3;margin:0;font-weight:700;text-wrap:balance}
+.lead{margin:0;color:var(--muted)}
+
+.rules{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.rules h2{font-family:var(--font-display);font-size:19px;margin:0 0 6px}
+.rules ol{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:4px}
+.rules li::marker{font-weight:700;color:var(--accent)}
+
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tab{font:inherit;text-align:left;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 14px;cursor:pointer;min-height:64px;display:flex;flex-direction:column;gap:0;line-height:1.5}
+.tab b{font-family:var(--font-display);font-size:17px}
+.tab small{color:var(--muted);font-size:13px}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tab[aria-selected="true"] small{color:var(--accent-ink);opacity:.9}
+
+.panel{display:flex;flex-direction:column;gap:18px;min-width:0}
+.panel-intro{margin:0}
+.bar{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+.bar .track{flex:1;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar .fill{height:100%;width:0;background:var(--ok);transition:width .3s}
+@media (prefers-reduced-motion:reduce){.bar .fill{transition:none}}
+
+.q{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.q-head{display:flex;align-items:center;gap:10px}
+.q-no{font-family:var(--font-display);font-weight:700;background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:1px 10px;font-size:15px}
+.q-field{font-size:13px;color:var(--muted);letter-spacing:.1em}
+.q-text{margin:0;font-size:17px;font-weight:500}
+.fig{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px}
+.fig svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+.tbl{overflow-x:auto}
+.tbl table{border-collapse:collapse;width:100%;min-width:420px;font-size:15px;line-height:1.6}
+.tbl th,.tbl td{border:1px solid var(--line);padding:6px 10px;text-align:left}
+.tbl th{background:var(--surface-2)}
+.tbl td.num,.tbl th.num{font-variant-numeric:tabular-nums}
+.ans-label{font-size:14px;font-weight:700;color:var(--muted)}
+textarea{width:100%;min-height:5.6rem;font:inherit;font-size:16px;color:var(--ink);background:var(--surface-2);border:2px solid var(--line);border-radius:8px;padding:10px 12px;resize:vertical}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.btn{font:inherit;font-size:15px;min-height:44px;padding:8px 16px;border-radius:8px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.hint{margin:0;background:var(--accent-soft);border-radius:8px;padding:10px 14px}
+.hint b{display:block;font-size:13px;letter-spacing:.08em;color:var(--accent)}
+.result{display:flex;flex-direction:column;gap:12px;border-top:2px dashed var(--line);padding-top:14px}
+.res-title{font-family:var(--font-display);font-size:18px;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.chip{font-size:14px;line-height:1.5;padding:3px 12px;border-radius:999px}
+.chip.hit{background:var(--ok-soft);color:var(--ok);font-weight:700}
+.chip.miss{background:var(--mark);color:var(--ink)}
+.chip.bonus{border:1px dashed var(--line)}
+.model{background:var(--ok-soft);border-radius:8px;padding:10px 14px}
+.model b{display:block;font-size:13px;letter-spacing:.08em;color:var(--ok)}
+.model p{margin:0;font-weight:500}
+.why{background:var(--accent-soft);border-radius:8px;padding:10px 14px}
+.why b{display:block;color:var(--accent);margin-bottom:2px}
+.why p{margin:4px 0;font-size:15px}
+.note{margin:0;font-size:15px}
+.note.small{font-size:14px;color:var(--muted)}
+.grade{display:flex;flex-direction:column;gap:6px}
+.grade-label{font-size:14px;font-weight:700}
+.grade-row{display:flex;flex-wrap:wrap;gap:8px}
+.grade .btn[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:var(--accent-ink);font-weight:700}
+footer{font-size:13px;color:var(--muted)}
+
+/* 図の部品 */
+.s-line{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.s-thin{fill:none;stroke:var(--muted);stroke-width:1.2}
+.s-dash{fill:none;stroke:var(--muted);stroke-width:1.2;stroke-dasharray:4 3}
+.s-glass{fill:var(--glass);stroke:var(--ink);stroke-width:2;stroke-linejoin:round}
+.s-glass-n{fill:var(--glass);stroke:none}
+.s-t{font-size:12px;fill:var(--ink);font-family:var(--font-body)}
+.s-tb{font-size:13px;font-weight:700;fill:var(--ink);font-family:var(--font-body)}
+.s-tm{font-size:11px;fill:var(--muted);font-family:var(--font-body)}
+.s-water{fill:var(--water)}
+.s-eth{fill:var(--ethanol)}
+.s-leaf{fill:var(--leaf);stroke:var(--ink);stroke-width:1.5}
+.s-leafp{fill:var(--leaf-pale);stroke:var(--ink);stroke-width:1.5}
+.s-flame{fill:var(--flame)}
+.s-metal{fill:var(--metal);stroke:var(--ink);stroke-width:1.5}
+.s-sponge{fill:var(--sponge);stroke:var(--ink);stroke-width:1.5;stroke-linejoin:round}
+.s-block{fill:var(--glass);stroke:var(--ink);stroke-width:2}
+.s-acc{fill:var(--accent);stroke:var(--ink);stroke-width:1.5}
+.s-box{fill:var(--surface);stroke:var(--ink);stroke-width:2}
+.s-trace{fill:none;stroke:var(--ink);stroke-width:1.4;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="back" href="https://chugaku.senta1111.workers.dev/" target="_blank" rel="noopener">← 中学の自習サイト トップへ</a>
+    <div class="eyebrow">中学社会　しあげ</div>
+    <h1>余裕があれば記述式に挑戦！</h1>
+    <p class="lead">理由を聞かれたら、点がとれる書き方がある。書く → 答え合わせ → 自分で ○△× をつける。</p>
+  </header>
+
+  <section class="rules" aria-labelledby="rules-h">
+    <h2 id="rules-h">書き方の3か条</h2>
+    <ol>
+      <li>聞かれたことだけに答える。「理由」なら、文末は<span class="mk">「〜から」「〜ため」</span>。</li>
+      <li>採点ポイントの<span class="mk">キーワード</span>を入れる。1つ入るごとに点がつく。</li>
+      <li>1文で短く書く。わからなくても<span class="mk">空欄にしない</span>。近いことを書けば点がつくことがある。</li>
+    </ol>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="分野">
+    <button class="tab" role="tab" id="tab-r" aria-selected="true" aria-controls="panel-r" data-set="r"><b>歴史</b><small>16問</small></button>
+    <button class="tab" role="tab" id="tab-g" aria-selected="false" aria-controls="panel-g" data-set="g"><b>地理</b><small>16問</small></button>
+    <button class="tab" role="tab" id="tab-k" aria-selected="false" aria-controls="panel-k" data-set="k"><b>公民</b><small>16問</small></button>
+  </div>
+
+  <section class="panel" id="panel-r" role="tabpanel" aria-labelledby="tab-r">
+    <p class="panel-intro">1〜10は、どの学校のテストにも出る定番。11〜16は、資料や語句の指定がつく、点差がつく問題。</p>
+    <div class="bar" data-bar="r"><span class="bar-text">○ 0 / 16</span><span class="track"><span class="fill"></span></span></div>
+    <div class="qlist" data-list="r" style="display:flex;flex-direction:column;gap:18px"></div>
+  </section>
+
+  <section class="panel" id="panel-g" role="tabpanel" aria-labelledby="tab-g" hidden>
+    <p class="panel-intro">1〜10は、どの学校のテストにも出る定番。11〜16は、語句を使って流れを書く、点差がつく問題。</p>
+    <div class="bar" data-bar="g"><span class="bar-text">○ 0 / 16</span><span class="track"><span class="fill"></span></span></div>
+    <div class="qlist" data-list="g" style="display:flex;flex-direction:column;gap:18px"></div>
+  </section>
+
+  <section class="panel" id="panel-k" role="tabpanel" aria-labelledby="tab-k" hidden>
+    <p class="panel-intro">1〜10は、どの学校のテストにも出る定番。11〜16は、しくみを説明する、点差がつく問題。</p>
+    <div class="bar" data-bar="k"><span class="bar-text">○ 0 / 16</span><span class="track"><span class="fill"></span></span></div>
+    <div class="qlist" data-list="k" style="display:flex;flex-direction:column;gap:18px"></div>
+  </section>
+
+<footer>記録はこの端末のブラウザに保存されます。消したいときは、各問題の「書きなおす」を押してください。</footer>
+</div>
+
+<script>
+/*DATA_START*/
+function R(a,b){return '<ruby>'+a+'<rt>'+b+'</rt></ruby>'}
+function tbl(head,rows){return '<div class="tbl"><table><thead><tr>'+head.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'}
+const Q=[
+/* ============ 歴史 ============ */
+{id:'r1',set:'r',no:'歴史 定番 1',field:'安土桃山',
+ prompt:'織田信長は、安土城の城下町で「'+R('楽市','らくいち')+'・'+R('楽座','らくざ')+'」を出した。そのねらい（目的）を答えなさい。',
+ template:'（　　）の特権をなくして、だれでも（　　）できるようにし、城下町の商工業を（　　）させるため。',
+ groups:[
+  {label:'座の特権（独占）をなくす',re:/座|特権|独占|税/},
+  {label:'だれでも自由に商売できる',re:/自由|だれでも|誰でも|だれもが|誰もが/},
+  {label:'城下町の商工業が発展する',re:/発展|活発|さかん|盛ん|にぎわ|栄え/,bonus:true}],
+ model:'座の特権をなくし、だれでも自由に商売できるようにして、城下町の商工業を発展させるため。',
+ point:'「座の特権をなくす」「自由に商売」の2つが主な点。「商工業の発展」まで書けると満点。座とは、商人や職人の同業者組合のこと。',
+ trap:'ただし「商人を集めるため」だけだと弱い。集めるために、何を変えた（特権をなくした・自由にした）のかを書く。'},
+{id:'r2',set:'r',no:'歴史 定番 2',field:'安土桃山',
+ prompt:'豊臣秀吉は、百姓から刀ややりなどの武器を取り上げる「'+R('刀狩','かたながり')+'」を行った。その目的を答えなさい。',
+ template:'百姓から（　　）を取り上げ、（　　）を防ぎ、（　　）に専念させるため。',
+ groups:[
+  {label:'武器（刀）を取り上げる',re:/武器|刀|取り上げ|没収|とりあげ/},
+  {label:'一揆（反乱）を防ぐ',re:/一揆|反乱|反抗|さからう|逆らう|ほう起|蜂起/},
+  {label:'農業に専念させる（兵農分離）',re:/農業|耕作|専念|兵農分離|田畑|農作業/,bonus:true}],
+ model:'百姓から武器を取り上げて、一揆を防ぎ、農業に専念させるため。',
+ point:'「武器を取り上げる」と「一揆を防ぐ」の2つが必要。さらに、武士と百姓の身分を分ける（兵農分離）ねらいがあった。',
+ trap:'ただし「戦争に使わせないため」は弱い。百姓が起こす「一揆」を防ぐ、という点を書く。'},
+{id:'r3',set:'r',no:'歴史 定番 3',field:'江戸時代',
+ prompt:'江戸幕府は鎖国を行い、貿易を厳しく制限した。それでも、オランダと中国とは長崎で貿易を続けた。その理由を答えなさい。',
+ template:'オランダと中国は、（　　）の布教を（　　）から。',
+ groups:[
+  {label:'キリスト教の布教',re:/キリスト教|布教|宗教|キリシタン/},
+  {label:'布教を行わない（心配がない）',re:/しない|行わない|おこなわない|なかった|せず|心配/},
+  {label:'貿易の利益・幕府が管理',re:/利益|もうけ|管理|独占|貿易/,bonus:true}],
+ model:'オランダと中国は、キリスト教の布教を行わなかったため。幕府は貿易の利益も得られたから。',
+ point:'鎖国の一番の目的は、キリスト教の禁止。だから「布教をしない相手」とだけ貿易した、と書く。',
+ trap:'ただし「仲がよかったから」「近かったから」は×。理由の中心は、キリスト教を広めなかったこと。'},
+{id:'r4',set:'r',no:'歴史 定番 4',field:'江戸時代',
+ prompt:'江戸幕府は、大名を1年おきに江戸と領地に住まわせる「'+R('参勤交代','さんきんこうたい')+'」を制度にした。そのねらい（目的）を答えなさい。',
+ template:'大名に多くの（　　）を使わせて、幕府に（　　）力を弱めるため。',
+ groups:[
+  {label:'大名に費用（お金）を使わせる',re:/費用|出費|お金|金|財政|経済|負担/},
+  {label:'大名の力を弱める（反乱を防ぐ）',re:/弱め|弱く|弱ら|反乱|さからう|逆らう|従わ|支配|統制/},
+  {label:'江戸と領地の往復・行列',re:/往復|行列|江戸|領地|ひんぱん/,bonus:true}],
+ model:'大名に江戸と領地の往復などの多くの費用を使わせて、幕府にさからう力を弱めるため。',
+ point:'「費用（お金）がかかる」と「力を弱める」の2つがそろえば主な点。',
+ trap:'ただし「大名を監視するため」だけだと弱い。お金を使わせて力を弱める、という点を書く。'},
+{id:'r5',set:'r',no:'歴史 定番 5',field:'明治時代',
+ prompt:'明治政府が行った「'+R('地租改正','ちそかいせい')+'」により、政府の収入が安定した。その理由を答えなさい。',
+ template:'税を、（　　）を基準に、（　　）で納めさせ、収穫量に関係なく（　　）になったから。',
+ groups:[
+  {label:'地価（土地の値段）を基準にした',re:/地価|土地の(値段|価格|価値)|土地に/},
+  {label:'現金で納める',re:/現金|お金|金納|貨幣/},
+  {label:'収穫量に関係なく税が一定',re:/関係|一定|変わらない|かわらない|不作|豊作|凶作|安定/}],
+ model:'税を地価を基準にして現金で納めさせ、豊作・不作などの収穫量に関係なく、収入が一定になったから。',
+ point:'江戸時代は米（収穫量）で納めたので、不作の年は収入が減った。地租改正では「地価の3％を現金で」と決めたので、毎年同じになった。',
+ trap:'ただし「税の種類が増えたから」は×。増えたのではなく、納め方が（収穫量→地価、米→現金）変わった。'},
+{id:'r6',set:'r',no:'歴史 定番 6',field:'明治時代',
+ prompt:'明治政府は、群馬県に官営の「'+R('富岡製糸場','とみおかせいしじょう')+'」をつくった。その目的を答えなさい。',
+ template:'（　　）の技術を広めて（　　）の生産を増やし、輸出で外国のお金を得るため。',
+ groups:[
+  {label:'生糸（製糸）の生産',re:/生糸|製糸|きいと|糸/},
+  {label:'輸出して外国のお金を得る',re:/輸出|外国|外貨|貿易/},
+  {label:'新しい機械・技術を広める',re:/技術|機械|模範|広め|導入|近代/,bonus:true}],
+ model:'フランスの最新の機械と技術を広めて生糸の生産を増やし、輸出で外国のお金を得るため。',
+ point:'当時の日本の主な輸出品は生糸。「生糸」と「輸出」の2つが必要。国を豊かにする政策（殖産興業）の1つ。',
+ trap:'ただし「女性の仕事をつくるため」は×。目的は、輸出品を育てて国を豊かにすること。'},
+{id:'r7',set:'r',no:'歴史 定番 7',field:'大正時代',
+ prompt:'1918年、全国で「'+R('米騒動','こめそうどう')+'」が起こった。その理由を答えなさい。',
+ template:'（　　）の買いしめなどで、（　　）の値段が急に上がり、生活が苦しくなったから。',
+ groups:[
+  {label:'米の値段が急に上がった',re:/値段|価格|値上|高騰|上が|高く/},
+  {label:'米',re:/米|こめ/},
+  {label:'シベリア出兵・米の買いしめ',re:/シベリア|買いしめ|買い占め|買い占|商人/,bonus:true}],
+ model:'シベリア出兵をみこした米の買いしめで、米の値段が急に上がり、生活が苦しくなったから。',
+ point:'「米の値段が上がった」が核心。原因として、シベリア出兵を見こした商人の買いしめがあった。',
+ trap:'ただし「米がとれなかったから」だけだと弱い。値段が上がった原因（買いしめ）まで書けると高得点。'},
+{id:'r8',set:'r',no:'歴史 定番 8',field:'昭和（戦後）',
+ prompt:'戦後の「'+R('農地改革','のうちかいかく')+'」で、自作農が大きく増えた。その理由を、「地主」「小作人」の語を使って答えなさい。',
+ template:'政府が（　　）の土地を買い上げ、（　　）に安く売りわたしたから。',
+ groups:[
+  {label:'地主の土地を政府が買い上げた',re:/地主/},
+  {label:'政府が買い上げる',re:/政府|国|買い上げ|買い取|買いあげ/},
+  {label:'小作人に安く売りわたした',re:/小作人|小作/}],
+ model:'政府が地主の土地を買い上げ、小作人に安く売りわたしたから。',
+ point:'「地主」「政府が買い上げ」「小作人に売る」の流れで書く。この結果、土地を持つ自作農が増えた。',
+ trap:'ただし「小作人に土地をあげたから」は少しちがう。タダではなく、安く売りわたした。'},
+{id:'r9',set:'r',no:'歴史 定番 9',field:'明治時代',
+ prompt:'日露戦争の講和条約（ポーツマス条約）に、多くの国民が不満をもった。その理由を答えなさい。',
+ template:'戦争で大きな犠牲や負担に耐えたのに、（　　）が得られなかったから。',
+ groups:[
+  {label:'賠償金が得られない',re:/賠償金|賠償|ばいしょう/},
+  {label:'得られなかった',re:/得られ|もらえ|なかった|取れ|とれ/},
+  {label:'戦争の犠牲・増税の負担',re:/犠牲|負担|増税|税|死者|耐え/,bonus:true}],
+ model:'増税や多くの犠牲に耐えたのに、ロシアから賠償金が得られなかったから。',
+ point:'「賠償金が得られなかった」が最重要。国民は増税などの負担に耐えたので不満が大きく、日比谷焼き打ち事件が起こった。',
+ trap:'ただし「戦争に勝てなかったから」は×。日本は優勢のまま講和したが、賠償金がなかった。'},
+{id:'r10',set:'r',no:'歴史 定番 10',field:'鎌倉時代',
+ prompt:'元寇（元の襲来）のあと、御家人は幕府に不満をもつようになった。その理由を答えなさい。',
+ template:'元寇は防衛戦で新しい領地が得られず、御家人に十分な（　　）があたえられなかったから。',
+ groups:[
+  {label:'恩賞（ほうび・土地）',re:/恩賞|ほうび|褒美|土地|領地|ごほうび/},
+  {label:'十分にあたえられなかった',re:/十分|あたえ|与え|もらえ|なかった|得られ/},
+  {label:'防衛戦で新しい領地がない',re:/防衛|防ぐ|守る|新しい|得られ|うばっ|奪/,bonus:true}],
+ model:'元寇は防衛戦で新しい領地が得られなかったため、幕府は御家人に十分な恩賞をあたえられなかったから。',
+ point:'「恩賞が十分でなかった」が核心。御恩と奉公の関係が成り立たなくなり、幕府は信頼を失った。',
+ trap:'ただし「戦いに負けたから」は×。元には勝った（退けた）のに、ほうびがなかったのが不満の理由。'},
+
+{id:'r11',set:'r',no:'歴史 ねらい 1',field:'江戸時代末',
+ prompt:'開国後、日本から大量の金が外国へ流れ出した。下の表をもとに、外国人が日本で利益を得られた理由を答えなさい。',
+ table:tbl(['','金1に対する銀の量'],[['日本','銀5'],['外国','銀15']]),
+ template:'日本は外国より（　　）の価値が安く、外国人は（　　）を日本で金にかえて持ち出すと利益が出たから。',
+ groups:[
+  {label:'日本は金が（外国より）安い',re:/金.{0,12}(安|低|やす)|(安|低|やす).{0,12}金|銀.{0,12}(高|価値が高)/},
+  {label:'銀を金にかえて持ち出す',re:/持ち出|持ち帰|交換|かえ|替え|両替|売/},
+  {label:'利益・もうけ',re:/利益|もうけ|儲け|得/,bonus:true}],
+ model:'日本は外国より金の価値が安いため、外国人が銀を日本の金にかえて持ち出すと、大きな利益が出たから。',
+ point:'外国では金1＝銀15、日本では金1＝銀5。つまり日本の金は外国の3分の1の安さ。「日本の金は安い」「銀と交換して持ち出す」の2点を書く。',
+ why:['なぜ、金を持ち出すともうかるの？',['外国で銀15を持っていたとする。日本に持ちこむと、銀5で金1に交換できるので、金3と交換できる。',
+  'その金3を外国へ持って帰って、金1＝銀15で売ると、銀45になる。銀15が、ぐるっと回すだけで銀45に増える。こうして日本から金が大量に出ていった。']],
+ trap:'ただし「日本の金が少なかったから」は×。ポイントは、日本と外国の「金と銀の交換比率」のちがい。'},
+{id:'r12',set:'r',no:'歴史 ねらい 2',field:'江戸時代',
+ prompt:'老中の田沼意次は、商工業者に「'+R('株仲間','かぶなかま')+'」をつくることを認めた。その目的を、「税」の語を使って答えなさい。',
+ template:'株仲間に（　　）を認めるかわりに、（　　）を納めさせ、幕府の（　　）を増やすため。',
+ groups:[
+  {label:'税（運上金・冥加金）を納めさせる',re:/税|運上|冥加|納め|お金/},
+  {label:'幕府の収入を増やす',re:/収入|財政|増や|ゆたか|豊か|立て直|立直/},
+  {label:'営業の独占を認める',re:/独占|営業|商売|特権|認め/,bonus:true}],
+ model:'株仲間に営業の独占を認めるかわりに、税を納めさせて、幕府の収入を増やすため。',
+ point:'「税を納めさせる」と「幕府の収入を増やす」の2つ。株仲間は、同業者の組合。商業を活発にして税をとる政策だった。',
+ trap:'ただし「商人をもうけさせるため」は×。ねらいは、幕府の収入を増やすこと。'},
+{id:'r13',set:'r',no:'歴史 ねらい 3',field:'大正時代',
+ prompt:'1925年、政府は普通選挙法と同時に治安維持法をつくった。その理由を、「社会主義」の語を使って答えなさい。',
+ template:'普通選挙で（　　）運動が広がるのを、（　　）ため。',
+ groups:[
+  {label:'社会主義（運動）',re:/社会主義|共産主義|労働運動|社会運動/},
+  {label:'広がるのをおさえる（取りしまる）',re:/おさえ|抑え|取りしまる|取り締ま|防ぐ|防止|弾圧|恐れ|心配/},
+  {label:'普通選挙・国民の力が強まる',re:/選挙|労働者|国民|力|政治/,bonus:true}],
+ model:'普通選挙で労働者の力が強まり、社会主義の運動が広がるのをおさえるため。',
+ point:'「社会主義運動」と「おさえる（取りしまる）」の2つ。同じ年に、「飴」（普通選挙）と「むち」（治安維持法）を出した形。',
+ trap:'ただし「治安をよくするため」だけだと弱い。何から守るのか（社会主義運動）まで書く。'},
+{id:'r14',set:'r',no:'歴史 ねらい 4',field:'平安時代',noEnd:true,
+ prompt:'平安時代、藤原氏は摂政・関白となって大きな力をもった。藤原氏が実権をにぎった方法を、「きさき」「祖父」の語を使って答えなさい。',
+ template:'（　　）を天皇の（　　）にし、生まれた子を天皇にして、天皇の（　　）として力をもった。',
+ groups:[
+  {label:'むすめを天皇のきさきにする',re:/むすめ|娘|きさき|后|妃/},
+  {label:'生まれた子を天皇にする',re:/子|生まれ|皇子|次の天皇|天皇にし|天皇に/},
+  {label:'天皇の祖父（外戚）になる',re:/祖父|外戚|おじいさん/}],
+ model:'むすめを天皇のきさきにし、生まれた子を次の天皇にして、天皇の祖父として実権をにぎった。',
+ point:'「むすめ→きさき」「生まれた子が天皇」「祖父」の流れ。この政治を摂関政治という。',
+ trap:'ただし「天皇に勝ったから」は×。戦いではなく、結婚（親せき関係）で力をもった。'},
+{id:'r15',set:'r',no:'歴史 ねらい 5',field:'江戸時代末',
+ prompt:'日米修好通商条約は、日本にとって不平等な内容だった。不平等だった点を、「領事裁判権」と「関税」の語を使って答えなさい。',
+ template:'日本には（　　）がなく、外国人の犯罪を日本で裁けない（　　）を認めたから。',
+ groups:[
+  {label:'関税自主権がない',re:/関税/},
+  {label:'領事裁判権（外国人を日本で裁けない）',re:/領事裁判権|裁判|裁け|さばけ|治外/},
+  {label:'日本に（自主権が）ない',re:/ない|なく|なし|認め|ふくま|なかった/,bonus:true}],
+ model:'日本に関税自主権がなく、外国人の犯罪を日本で裁けない領事裁判権を認めたから。',
+ point:'不平等の2点セット。「関税自主権がない（輸入品の税を自由に決められない）」と「領事裁判権を認めた（外国人を日本の法律でさばけない）」。',
+ trap:'ただし関税は「関税がない」ではない。日本が関税を自分で決める権利（自主権）がなかった。'},
+{id:'r16',set:'r',no:'歴史 ねらい 6',field:'大正時代',
+ prompt:'第一次世界大戦中、日本は「大戦景気」とよばれる好景気になった。その理由を、「ヨーロッパ」「輸出」の語を使って答えなさい。',
+ template:'ヨーロッパが（　　）になり、アジアなどへの輸出が（　　）、かわりに日本の（　　）がのびたから。',
+ groups:[
+  {label:'ヨーロッパが戦場（戦争）',re:/ヨーロッパ|欧州|欧米|戦場|戦争/},
+  {label:'日本の輸出がのびた',re:/輸出|売れ|のび|伸び|増え|ふえ/},
+  {label:'ヨーロッパの輸出が減った',re:/減|へ|できなくなっ|止まっ/,bonus:true}],
+ model:'ヨーロッパが戦場になってアジアなどへの輸出が減り、かわりに日本の輸出が大きくのびたから。',
+ point:'「ヨーロッパが戦場」「日本の輸出がのびた」の2つ。重工業が発展し、船成金とよばれる人も現れた。',
+ trap:'ただし「日本も戦争に参加して勝ったから」は×。日本の戦場は主にアジアで、好景気の理由は輸出の増加。'},
+
+/* ============ 地理 ============ */
+{id:'g1',set:'g',no:'地理 定番 1',field:'日本の工業',
+ prompt:'日本の工業地帯（太平洋ベルト）は、海ぞいに集中している。その理由を、「輸入」「輸出」の語を使って答えなさい。',
+ template:'原料を（　　）で輸入し、製品を（　　）で輸出するのに便利だから。',
+ groups:[
+  {label:'原料を輸入',re:/輸入|原料|石油|鉄鉱石/},
+  {label:'製品を輸出',re:/輸出|製品/},
+  {label:'船（港）で運べて便利',re:/船|港|海上|海に面|運搬|輸送|便利/,bonus:true}],
+ model:'原料を船で輸入し、製品を船で輸出するのに便利だから。',
+ point:'日本は工業の原料（石油・鉄鉱石など）の多くを輸入にたよる。船で大量に運べる海ぞいが有利。',
+ trap:'ただし「人が多いから」だけだと弱い。「輸入」と「輸出」の両方を使って書く。'},
+{id:'g2',set:'g',no:'地理 定番 2',field:'日本の農業',
+ prompt:'高知平野や宮崎平野では、ビニールハウスでピーマンやなすを早く育てる「'+R('促成栽培','そくせいさいばい')+'」がさかんである。その理由を答えなさい。',
+ template:'冬でも（　　）な気候を生かし、他の産地の出荷が（　　）時期に、（　　）値段で売れるから。',
+ groups:[
+  {label:'冬でも温暖（あたたかい）',re:/温暖|暖か|あたたか|あたたかい|暖流|黒潮/},
+  {label:'出荷が少ない時期に高く売れる',re:/高く|高い値|値段|出荷時期|少ない時期|ずらし|ほかの産地|他の産地/},
+  {label:'ビニールハウスで早く育てる',re:/ビニール|ハウス|早く|早め/,bonus:true}],
+ model:'冬でも暖かい気候を生かし、ビニールハウスで早く育てて、他の産地の出荷が少ない時期に高く売れるから。',
+ point:'「温暖な気候」と「出荷時期をずらして高く売る」の2つが必要。',
+ trap:'ただし「暖かいから」だけでは足りない。「なぜもうかるのか（高く売れる）」まで書く。'},
+{id:'g3',set:'g',no:'地理 定番 3',field:'日本の農業',
+ prompt:'新潟県など北陸地方で、稲作がさかんな理由を、「雪どけ水」の語を使って答えなさい。',
+ template:'春に（　　）水が豊富で、広い（　　）に水田が広がっているから。',
+ groups:[
+  {label:'雪どけ水が豊富',re:/雪どけ|雪解け|雪融け|水が豊富|水が多/},
+  {label:'広い平野に水田',re:/平野|広い|水田|平地/},
+  {label:'川から水を引く',re:/川|信濃川|水を引|用水/,bonus:true}],
+ model:'春に雪どけ水が豊富で、川から水を引き、広い平野に水田が広がっているから。',
+ point:'冬にたくさん降った雪が、春にとけて川を流れ、稲作に使える水になる。',
+ trap:'ただし「雪が多いから」だけだと弱い。雪が「とけて水になる」点まで書く。'},
+{id:'g4',set:'g',no:'地理 定番 4',field:'日本の人口',
+ prompt:'東京都千代田区は、昼間の人口が夜間の人口よりずっと多い。その理由を答えなさい。',
+ template:'周辺の県などから（　　）や（　　）で、人が集まってくるから。',
+ groups:[
+  {label:'通勤・通学',re:/通勤|通学|仕事|勤め|会社|学校/},
+  {label:'周辺（ほかの地域）から集まる',re:/周辺|ほか|他|郊外|県|集ま|流入|通って/},
+  {label:'オフィス・学校が多い',re:/オフィス|会社が多い|官庁|事務所|多い/,bonus:true}],
+ model:'周辺の県などから、通勤や通学で人が集まってくるが、住んでいる人は少なく、オフィスが多いから。',
+ point:'住んでいる人（夜間人口）は少ないが、働く・学ぶ人が周辺から通ってくるので、昼は多い。',
+ trap:'ただし「人が多いから」では説明になっていない。どこから何のために来るのか（通勤・通学）を書く。'},
+{id:'g5',set:'g',no:'地理 定番 5',field:'日本の農業',
+ prompt:'日本の食料自給率は、昔より大きく低下した。その理由を、「食生活」「輸入」の語を使って答えなさい。',
+ template:'食生活が変わって（　　）の消費が減り、安い外国産の（　　）が増えたから。',
+ groups:[
+  {label:'食生活の変化（米離れ・肉や乳製品）',re:/食生活|米の消費|米を食べ|パン|肉|乳製品|洋風|食べ方/},
+  {label:'輸入が増えた',re:/輸入/},
+  {label:'外国産が安い',re:/安い|安く|安価/,bonus:true}],
+ model:'食生活が変わって米の消費が減り、安い外国産の食料の輸入が増えたから。',
+ point:'「食生活の変化」と「輸入の増加」の2つ。肉や小麦、飼料の多くは輸入にたよっている。',
+ trap:'ただし「農家が減ったから」だけだと弱い。まず「食生活が変わった」「輸入が増えた」を書く。'},
+{id:'g6',set:'g',no:'地理 定番 6',field:'世界の気候',
+ prompt:'赤道に近い南アメリカのキトなどの都市は、一年中すずしい。その理由を、「標高」の語を使って答えなさい。',
+ template:'（　　）が高い（高地）ため、気温が（　　）から。',
+ groups:[
+  {label:'標高が高い',re:/標高|高地|高い所|高いところ|山/},
+  {label:'気温が低い（すずしい）',re:/気温|低|すずし|涼し|下が/},
+  {label:'100mで約0.6℃下がる',re:/0\.6|100m|100ｍ|0。6/,bonus:true}],
+ model:'標高が高い高地にあるため、気温が低くなる（100mで約0.6℃下がる）から。',
+ point:'標高が100m高くなると、気温は約0.6℃下がる。だから赤道の近くでも、高地はすずしい。',
+ trap:'ただし「赤道から遠いから」は×。キトは赤道の真下近く。理由は緯度ではなく標高。'},
+{id:'g7',set:'g',no:'地理 定番 7',field:'世界の気候',
+ prompt:'西ヨーロッパは、日本の北海道より高緯度にあるが、冬もそれほど寒くない。その理由を、「暖流」「偏西風」の語を使って答えなさい。',
+ template:'暖流の（　　）の上を、（　　）がふくため。',
+ groups:[
+  {label:'暖流（北大西洋海流）',re:/暖流|北大西洋海流|大西洋/},
+  {label:'偏西風',re:/偏西風|西風/},
+  {label:'暖かい空気がはこばれる',re:/暖か|あたたか|熱|運ぶ|はこ|温め/,bonus:true}],
+ model:'暖流の北大西洋海流の上を、偏西風がふいて暖かい空気をはこぶため。',
+ point:'「暖流（北大西洋海流）」と「偏西風」の2つ。海から暖められた空気が、西風にのって陸にとどく。',
+ trap:'ただし「南にあるから」は×。緯度は高い。理由は海流と風。'},
+{id:'g8',set:'g',no:'地理 定番 8',field:'世界の国々',
+ prompt:'中国は、沿岸部に「経済特区」をつくった。その目的を、「外国」の語を使って答えなさい。',
+ template:'税などを（　　）して（　　）企業を呼び、資本や技術を取り入れるため。',
+ groups:[
+  {label:'外国の企業を呼ぶ',re:/外国|外資|海外/},
+  {label:'資本・技術を取り入れる',re:/資本|技術|資金|お金|工場/},
+  {label:'税などを優遇する',re:/優遇|安く|減ら|免除|ゆうぐう/,bonus:true}],
+ model:'税などを優遇して外国の企業を呼び、外国の資本や技術を取り入れて経済を発展させるため。',
+ point:'「外国企業を呼ぶ」と「資本・技術を取り入れる」の2つ。1980年代の改革・開放政策の1つ。',
+ trap:'ただし「輸出を増やすため」だけだと弱い。まず、外国の企業を呼んで技術を取り入れる点を書く。'},
+{id:'g9',set:'g',no:'地理 定番 9',field:'世界の産業',
+ prompt:'特定の農産物や鉱産資源の輸出にたよる「モノカルチャー経済」の国で、経済が不安定になりやすい理由を答えなさい。',
+ template:'（　　）の価格が下がったり、不作になったりすると、国の（　　）が大きく減るから。',
+ groups:[
+  {label:'国際価格の変動（不作）',re:/価格|値段|不作|天候|変動|下が|上が/},
+  {label:'国の収入が大きく変わる',re:/収入|経済|輸出|お金|外貨|財政|不安定/},
+  {label:'特定の産物にたよる',re:/特定|1つ|一つ|限られ|たよ|頼/,bonus:true}],
+ model:'特定の産物の輸出にたよっているので、国際価格が下がったり不作になると、国の収入が大きく減るから。',
+ point:'1つの産物にたよるので、その価格や天候の影響をまともに受ける。「価格の変動」と「収入が不安定」の2つ。',
+ trap:'ただし「貧しいから」は理由になっていない。価格や不作で、収入が大きく動く点を書く。'},
+{id:'g10',set:'g',no:'地理 定番 10',field:'日本の水産業',
+ prompt:'日本の遠洋漁業は、1970年代以降大きく減った。その理由を、「排他的経済水域」の語を使って答えなさい。',
+ template:'各国が（　　）を設定し、他国の海で自由に（　　）ができなくなったから。',
+ groups:[
+  {label:'排他的経済水域（200海里）',re:/排他的経済水域|排他的|200海里|二百海里|EEZ/},
+  {label:'他国の海で漁ができない',re:/漁|魚|とれ|取れ|制限|自由に/},
+  {label:'各国が設定した',re:/設定|決め|各国|沿岸国/,bonus:true}],
+ model:'各国が排他的経済水域を設定し、他国の海で自由に漁ができなくなったから。',
+ point:'海岸から200海里（約370km）の海は、その国のもの。そこでは、他国は自由に漁ができない。',
+ trap:'ただし「魚が減ったから」だけだと弱い。国際的なルール（排他的経済水域）の変化を書く。'},
+
+{id:'g11',set:'g',no:'地理 ねらい 1',field:'日本の気候',
+ prompt:'日本海側の地域は、冬に雪が多い。その理由を、「季節風」「日本海」の語を使って答えなさい。',
+ template:'冬、（　　）の季節風が（　　）で水蒸気をふくみ、山地にぶつかって雪をふらせるから。',
+ groups:[
+  {label:'北西の季節風',re:/北西|季節風/},
+  {label:'日本海で水蒸気をふくむ',re:/日本海|水蒸気|湿|海から/},
+  {label:'山地にぶつかって雪をふらせる',re:/山|ぶつか|雪をふら|雪雲|上昇/}],
+ model:'冬、北西の季節風が日本海で水蒸気をふくみ、山地にぶつかって雪をふらせるから。',
+ point:'3つの流れ「北西の季節風→日本海で水蒸気→山地で雪」を順に書くと満点。',
+ trap:'ただし「寒いから」だけだと弱い。寒さだけでは雪は多くならない。水蒸気をふくんだ風が山にぶつかるのが理由。'},
+{id:'g12',set:'g',no:'地理 ねらい 2',field:'日本の人口',
+ prompt:'少子高齢化が進むと、現役世代一人あたりの社会保障の負担が重くなる。その理由を、「働く世代」の語を使って答えなさい。',
+ template:'（　　）が減り、年金や医療費を必要とする（　　）が増えるから。',
+ groups:[
+  {label:'働く世代が減る',re:/働く世代|現役|生産年齢|若い|子ども|子供|少子/},
+  {label:'高齢者が増える',re:/高齢|お年寄り|年金|医療/},
+  {label:'1人あたりの負担が重い',re:/負担|重く|ささえ|支え/,bonus:true}],
+ model:'働く世代が減り、年金や医療費を必要とする高齢者が増えるため、一人あたりの負担が重くなるから。',
+ point:'「働く世代が減る」と「高齢者が増える」の2つを対にして書く。',
+ trap:'ただし「高齢者が多いから」だけだと不十分。支える側（働く世代）が減っている点もセットで書く。'},
+{id:'g13',set:'g',no:'地理 ねらい 3',field:'日本の農業',
+ prompt:'地元でとれた農産物を地元で消費する「地産地消」には、どんな利点があるか。「新鮮」「輸送」の語を使って答えなさい。',
+ template:'（　　）なものが食べられ、（　　）にかかる費用や二酸化炭素を減らせるから。',
+ groups:[
+  {label:'新鮮',re:/新鮮|とれたて|鮮度/},
+  {label:'輸送の費用やCO₂が減る',re:/輸送|運ぶ|運搬|距離|費用|二酸化炭素|CO2|環境/},
+  {label:'地域の農業を応援',re:/地域|地元|生産者|顔が見|農家/,bonus:true}],
+ model:'とれたての新鮮なものが食べられ、輸送にかかる費用や二酸化炭素を減らせて、地元の農家も応援できるから。',
+ point:'「新鮮さ」と「輸送の短縮」の2つ。さらに、地域の農業を支える利点もある。',
+ trap:'ただし「安いから」だけだと弱い。「輸送距離が短い」ことと関連づける。'},
+{id:'g14',set:'g',no:'地理 ねらい 4',field:'世界の環境',
+ prompt:'熱帯林が減ると、地球温暖化が進むといわれる。その理由を、「二酸化炭素」「吸収」の語を使って答えなさい。',
+ template:'森林が伐採されて減ると、光合成で（　　）を（　　）する量が減り、大気中の量が増えるから。',
+ groups:[
+  {label:'二酸化炭素を吸収',re:/二酸化炭素|CO2|ＣＯ２|CO₂/},
+  {label:'吸収する量が減る',re:/吸収|吸う|すう|取りこ|光合成/},
+  {label:'森林の伐採・減少',re:/伐採|減る|減少|開発|切/,bonus:true}],
+ model:'森林が伐採されて減ると、光合成で二酸化炭素を吸収する量が減り、大気中の二酸化炭素が増えるから。',
+ point:'「二酸化炭素」「吸収が減る」の2つ。熱帯林は二酸化炭素を吸収する大きなはたらきをしている。',
+ why:['なぜ、森林が減ると二酸化炭素が増えるの？',['木は光合成で空気中の二酸化炭素をとりこみ、成長する。木が多い間は、二酸化炭素が減っていく。','森林を切ったり燃やしたりすると、この吸収が減る。さらに、燃やすと中の炭素が二酸化炭素として空気中にもどる。']],
+ trap:'ただし「森林が減ると暑くなるから」は少しずれる。温暖化の原因は、温室効果ガス（二酸化炭素）が増えること。'},
+{id:'g15',set:'g',no:'地理 ねらい 5',field:'日本の工業',
+ prompt:'日本の自動車会社は、アメリカなど海外に工場をつくっている。その理由を、「貿易摩擦」「現地」の語を使って答えなさい。',
+ template:'（　　）をさけ、（　　）の安い労働力や消費地に近い場所で生産できるから。',
+ groups:[
+  {label:'貿易摩擦をさける',re:/貿易摩擦|摩擦|輸出が多|輸出しすぎ/},
+  {label:'現地で生産できる',re:/現地|その国|海外で|地元/},
+  {label:'安い労働力・輸送費の節約',re:/安い|安く|労働力|賃金|輸送|消費地|費用/,bonus:true}],
+ model:'貿易摩擦をさけ、現地の安い労働力や、消費地に近い場所で生産できるから。',
+ point:'「貿易摩擦をさける」「現地で生産する」が2本の柱。日本から輸出しすぎると、相手国の産業を圧迫して問題になる。',
+ trap:'ただし「人件費が安いから」だけだと、アメリカの場合はあてはまりにくい。貿易摩擦を書く。'},
+{id:'g16',set:'g',no:'地理 ねらい 6',field:'日本の工業',noEnd:true,
+ prompt:'日本の「産業の空洞化」とは、どのようなことか。「海外」「国内」の語を使って答えなさい。',
+ template:'工場が（　　）に移り、（　　）の工業がおとろえて、働く場所が減ること。',
+ groups:[
+  {label:'工場が海外に移る',re:/海外|外国|国外/},
+  {label:'国内の工業がおとろえる',re:/国内|日本の|おとろえ|衰え|減る|減少/},
+  {label:'働く場所（雇用）が減る',re:/働く場所|雇用|仕事|就職|失業/,bonus:true}],
+ model:'工場が人件費の安い海外に移り、国内の工業がおとろえて、働く場所が減ること。',
+ point:'「工場が海外へ」と「国内の産業・働く場所が減る」の2つ。',
+ trap:'ただし「工場がなくなること」だけだと不十分。海外へ移っているのがポイント。'},
+
+/* ============ 公民 ============ */
+{id:'k1',set:'k',no:'公民 定番 1',field:'政治',
+ prompt:'日本では、国の権力を立法・行政・司法に分ける「'+R('三権分立','さんけんぶんりつ')+'」をとっている。そのねらい（目的）を答えなさい。',
+ template:'権力が1つの機関に（　　）するのを防ぎ、国民の（　　）を守るため。',
+ groups:[
+  {label:'権力の集中を防ぐ',re:/集中|独り占め|ひとり占め|分け|おさえ|抑え|にぎ|濫用|暴走/},
+  {label:'権力',re:/権力|力|政治/},
+  {label:'国民の自由・権利（人権）を守る',re:/自由|権利|人権|守る|まもる|保障/}],
+ model:'権力が1つの機関に集中するのを防ぎ、国民の自由と権利を守るため。',
+ point:'「権力の集中を防ぐ」と「国民の自由・権利を守る」の2つ。モンテスキューの考え方。',
+ trap:'ただし「仕事を分けると効率がよいから」は×。目的は効率ではなく、権力のらん用を防ぐこと。'},
+{id:'k2',set:'k',no:'公民 定番 2',field:'憲法',
+ prompt:'憲法の改正には、法律の改正よりも厳しい手続きが必要である。その理由を、「最高法規」の語を使って答えなさい。',
+ template:'憲法は国の（　　）で、国民の権利を守るものなので、（　　）に変えられないようにするため。',
+ groups:[
+  {label:'最高法規（国の基本）',re:/最高法規|国の基本|重要|大切|もっとも/},
+  {label:'かんたんに変えられない（慎重）',re:/簡単|かんたん|慎重|むやみ|軽々|安易|ころころ/},
+  {label:'国民の権利を守る',re:/権利|人権|自由|守る/,bonus:true}],
+ model:'憲法は国の最高法規で、国民の権利を守るものなので、かんたんに変えられないようにするため。',
+ point:'「最高法規」と「簡単に変えられない（慎重に）」の2つ。手続きは、各議院の総議員の3分の2以上の賛成で国会が発議し、国民投票で過半数の賛成。',
+ trap:'ただし「国民が反対するから」は×。厳しい手続きにしているのは、憲法の重みを守るため。'},
+{id:'k3',set:'k',no:'公民 定番 3',field:'政治',
+ prompt:'日本の国会は、衆議院と参議院の二院制をとっている。そのねらいを答えなさい。',
+ template:'2つの議院で、（　　）に審議し、国民の（　　）な意見を反映するため。',
+ groups:[
+  {label:'慎重に審議する',re:/慎重|じっくり|念入り|十分に|行きすぎ|暴走/},
+  {label:'審議・議論する',re:/審議|議論|話し合|決め/},
+  {label:'国民のさまざまな意見を反映する',re:/国民|意見|多様|さまざま|いろいろ|民意/,bonus:true}],
+ model:'2つの議院で慎重に審議し、国民の多様な意見を反映するため。',
+ point:'「慎重に審議する」が核心。もう一方の議院が、決定の行きすぎをチェックする。',
+ trap:'ただし「仕事を分担するため」は×。2つの議院で、同じ議案をそれぞれ審議する。'},
+{id:'k4',set:'k',no:'公民 定番 4',field:'政治',
+ prompt:'国会では、衆議院の議決が参議院より強い力をもつ（衆議院の優越）。その理由を答えなさい。',
+ template:'衆議院は任期が（　　）、（　　）もあるため、国民の意見をより強く反映すると考えられるから。',
+ groups:[
+  {label:'任期が短い',re:/任期|短い|4年|四年/},
+  {label:'解散がある',re:/解散/},
+  {label:'国民の意見（民意）をより反映',re:/国民|意見|民意|反映/}],
+ model:'衆議院は任期が短く、解散もあるため、国民の意見をより強く反映すると考えられるから。',
+ point:'「任期が短い」「解散がある」の2つが根拠。だから、国民の意見に近いと考える。',
+ trap:'ただし「人数が多いから」だけだと不十分。任期（4年）と解散で、選挙の回数が多いことがポイント。'},
+{id:'k5',set:'k',no:'公民 定番 5',field:'財政',
+ prompt:'消費税は、所得が低い人ほど負担が重くなるといわれる。その理由を、「所得」「割合」の語を使って答えなさい。',
+ template:'（　　）が低い人ほど、所得にしめる税の（　　）が大きくなるから。',
+ groups:[
+  {label:'所得（収入）',re:/所得|収入|給料|年収/},
+  {label:'割合（比率）が大きい',re:/割合|比率|わりあい|%|％/},
+  {label:'低い人ほど重い',re:/低い|少ない|低所得|重く|重い/}],
+ model:'所得が低い人ほど、所得にしめる税の割合が大きくなるから。',
+ point:'同じ物を買えば、所得が高くても低くても同じ税額。でも収入に対する割合は、低い人のほうが大きい。（逆進性）',
+ trap:'ただし「税率が人によってちがうから」は×。税率は全員同じ。ちがうのは、所得にしめる割合。'},
+{id:'k6',set:'k',no:'公民 定番 6',field:'経済',
+ prompt:'「クーリング・オフ」制度とは何か。その目的を、「消費者」の語を使って答えなさい。',
+ template:'一定期間内なら、契約を（　　）で解除できるようにして、（　　）を守るため。',
+ groups:[
+  {label:'一定期間内（8日など）',re:/期間|8日|八日|日以内|以内/},
+  {label:'契約を解除（取り消し）できる',re:/解除|取り消|キャンセル|やめ|無効/},
+  {label:'消費者を守る',re:/消費者|守る|保護|被害/}],
+ model:'訪問販売などで結んだ契約も、一定期間内なら無条件で解除できるようにして、消費者を守るため。',
+ point:'「一定期間内」「契約を解除」「消費者を守る」。強引な勧誘などで、よく考えずに結んだ契約を取り消せる。',
+ trap:'ただし「商品を安く買えるから」は×。目的は、消費者の保護。'},
+{id:'k7',set:'k',no:'公民 定番 7',field:'司法',
+ prompt:'2009年から、裁判員制度がはじまった。そのねらいを答えなさい。',
+ template:'国民の視点や（　　）を裁判に反映させ、司法への（　　）を高めるため。',
+ groups:[
+  {label:'国民の視点・感覚を反映',re:/国民|視点|感覚|常識|意見|市民/},
+  {label:'裁判に反映する',re:/裁判|反映|生かす|生かし|取り入れ/},
+  {label:'司法への理解・信頼',re:/理解|信頼|身近|関心/,bonus:true}],
+ model:'国民の視点や感覚を裁判に反映させ、司法への理解と信頼を高めるため。',
+ point:'「国民の感覚を裁判に生かす」と「司法への理解・信頼」の2つ。',
+ trap:'ただし「裁判官の数が足りないから」は×。目的は、国民が裁判に参加して、司法を身近にすること。'},
+{id:'k8',set:'k',no:'公民 定番 8',field:'司法',
+ prompt:'日本では、1つの事件について3回まで裁判を受けられる「三審制」をとっている。そのねらいを、「人権」の語を使って答えなさい。',
+ template:'裁判を（　　）に行い、（　　）を防いで、人権を守るため。',
+ groups:[
+  {label:'慎重に行う（くり返す）',re:/慎重|くり返|繰り返|何度|3回|三回|十分/},
+  {label:'まちがい（えん罪）を防ぐ',re:/まちがい|間違い|誤り|誤判|えん罪|冤罪|ミス/},
+  {label:'人権を守る',re:/人権|権利|守る/}],
+ model:'裁判を慎重に行い、まちがいを防いで、人権を守るため。',
+ point:'「慎重に行う」と「まちがい（えん罪）を防ぐ」。1回目の判決に納得できない場合に、控訴・上告できる。',
+ trap:'ただし「早く終わらせるため」は×。むしろ時間がかかっても、慎重に行うための制度。'},
+{id:'k9',set:'k',no:'公民 定番 9',field:'地方自治',
+ prompt:'国は、地方公共団体に「地方交付税交付金」をわたしている。その目的を答えなさい。',
+ template:'地方公共団体の間の（　　）の格差をなくし、どこでも一定の（　　）を受けられるようにするため。',
+ groups:[
+  {label:'財政（収入）の格差',re:/財政|財源|収入|お金|税/},
+  {label:'格差をなくす（調整する）',re:/格差|差|ちがい|違い|調整|ならす|平等/},
+  {label:'どこでも行政サービスを受けられる',re:/サービス|教育|福祉|どこでも|一定|水準/,bonus:true}],
+ model:'地方公共団体の間の財政の格差をなくし、どこでも一定の行政サービスを受けられるようにするため。',
+ point:'「財政の格差をなくす」が核心。税収の多い都市と少ない地方の差を、国が調整する。',
+ trap:'ただし「地方にお金をあげるため」だけだと弱い。何のため（格差の調整）かを書く。'},
+{id:'k10',set:'k',no:'公民 定番 10',field:'経済',
+ prompt:'台風で野菜の出荷量が減ると、野菜の値段が上がる。その理由を、「需要量」「供給量」の語を使って答えなさい。',
+ template:'（　　）が減り、買いたい量（　　）が供給量を（　　）から。',
+ groups:[
+  {label:'供給量が減る',re:/供給|出荷|入荷|減/},
+  {label:'需要量が供給量を上回る',re:/需要|買いたい|ほしい|欲しい|多い|上回|超え/},
+  {label:'品不足になる',re:/不足|足りない|足りなく|奪い合い/,bonus:true}],
+ model:'供給量が減り、買いたい量（需要量）が供給量を上回って品不足になるから。',
+ point:'「供給量が減る」と「需要量のほうが多くなる」の2つ。品不足になり、値段が上がる。',
+ trap:'ただし「需要量が増えたから」は×。この場合は、需要量は同じで、供給量が減った。'},
+
+{id:'k11',set:'k',no:'公民 ねらい 1',field:'政治',
+ prompt:'多数決で物事を決めるとき、少数意見も尊重することが大切だといわれる。その理由を答えなさい。',
+ template:'（　　）の人の権利を守り、より多くの人が（　　）できる決定にするため。',
+ groups:[
+  {label:'少数の人の意見（権利）',re:/少数|少ない|ひとりひとり|一人一人|弱い/},
+  {label:'権利を守る',re:/権利|人権|守る|無視|切り捨て/},
+  {label:'納得できる決定',re:/納得|合意|満足|よりよい|よい決定|最善|不満/,bonus:true}],
+ model:'少数の人の権利を守り、より多くの人が納得できる決定にするため。',
+ point:'「少数の人の権利を守る」が核心。多数決は、少数派の意見を切りすてるものではない。',
+ trap:'ただし「みんなの意見が同じになるから」は×。むしろ、ちがう意見をたいせつにする理由。'},
+{id:'k12',set:'k',no:'公民 ねらい 2',field:'経済',
+ prompt:'独占禁止法は、企業の独占を禁止している。その理由を、「競争」「消費者」の語を使って答えなさい。',
+ template:'企業どうしの（　　）をうながし、価格が不当に（　　）なるのを防いで、（　　）の利益を守るため。',
+ groups:[
+  {label:'競争をうながす',re:/競争/},
+  {label:'価格が高くなるのを防ぐ',re:/価格|値段|高く|高い|質|サービス/},
+  {label:'消費者の利益を守る',re:/消費者|利益|守る/}],
+ model:'企業どうしの競争をうながし、価格が不当に高くなるのを防いで、消費者の利益を守るため。',
+ point:'「競争がなくなる」→「独占企業が値段を自由に上げられる」→「消費者が困る」の流れ。',
+ trap:'ただし「大企業をおさえるため」だけだと弱い。守る相手（消費者）と、方法（競争）を書く。'},
+{id:'k13',set:'k',no:'公民 ねらい 3',field:'財政',
+ prompt:'所得税には、所得が高い人ほど税率が高くなる「累進課税」がとられている。そのねらいを、「格差」の語を使って答えなさい。',
+ template:'所得が高い人ほど（　　）税率にして、所得の（　　）を小さくするため。',
+ groups:[
+  {label:'所得の格差',re:/格差|差|ちがい/},
+  {label:'小さくする（再分配）',re:/小さく|縮め|是正|再分配|なくす|減らす|ならす|平等/},
+  {label:'高い人ほど高い税率',re:/高い人|高い税率|高く|所得|収入/,bonus:true}],
+ model:'所得が高い人ほど高い税率にして、所得の格差を小さくするため。',
+ point:'「格差を小さくする」が核心。集めた税金は、社会保障などで再分配される。',
+ trap:'ただし「お金持ちから税金をとりたいから」は弱い。目的（格差を小さくする）を書く。'},
+{id:'k14',set:'k',no:'公民 ねらい 4',field:'経済',
+ prompt:'不景気のとき、日本銀行は銀行から国債などを買う（公開市場操作）。そのねらいを、「金利」の語を使って答えなさい。',
+ template:'世の中に出回る（　　）を増やし、（　　）を下げて、企業がお金を借りやすくするため。',
+ groups:[
+  {label:'お金の量を増やす',re:/お金|資金|通貨|量/},
+  {label:'金利を下げる',re:/金利|利子|利率/},
+  {label:'企業が借りやすくなる',re:/借り|貸し|投資|設備|生産|景気|買い/,bonus:true}],
+ model:'世の中に出回るお金の量を増やし、金利を下げて、企業がお金を借りやすくするため。',
+ point:'「お金の量を増やす」と「金利を下げる」の2つ。景気をよくするための政策。',
+ why:['なぜ、国債を買うとお金が増えるの？',['日本銀行が国債を銀行から買うと、代金を銀行にわたす。すると、銀行の持つお金が増える。','お金が余った銀行は、貸し出しの金利を下げてでも貸したくなる。金利が下がれば、企業はお金を借りて工場を建てたり、人をやとったりしやすくなり、景気がよくなる。']],
+ trap:'ただし「国の借金を増やすため」は×。国債を買う相手は銀行で、目的は景気対策。'},
+{id:'k15',set:'k',no:'公民 ねらい 5',field:'経済',
+ prompt:'1ドル＝100円から1ドル＝80円になる（円高）と、日本の輸出企業は不利になる。下の表をもとに、その理由を「ドル」「値段」の語を使って答えなさい。',
+ table:tbl(['','1ドル＝100円のとき','1ドル＝80円のとき'],[['日本で100万円の自動車を、アメリカで売るときのドルの値段','10,000ドル','12,500ドル']]),
+ template:'同じ商品でも、外国での（　　）の値段が（　　）なり、売れにくくなるから。',
+ groups:[
+  {label:'ドルでの値段（外国での値段）',re:/ドル|外国|アメリカ|海外/},
+  {label:'値段が高くなる',re:/高く|上が|上昇|値上|高い/},
+  {label:'売れにくくなる',re:/売れ|輸出が減|輸出しにく|不利|減/,bonus:true}],
+ model:'同じ商品でも、外国でのドルの値段が高くなり、売れにくくなるから。',
+ point:'円高になると、外国から見て日本の商品が「高く」なる。表では、同じ100万円の自動車が、10,000ドルから12,500ドルに上がっている。',
+ why:['なぜ、円高だと外国での値段が高くなるの？',['1ドル＝100円のとき、100万円の車は、1万ドル（100万÷100）。','1ドル＝80円になると、同じ100万円の車は、12,500ドル（100万÷80）になる。円の価値が上がったぶん、ドルに直すと数字が大きくなる。外国の人は高く感じて、買いにくくなる。']],
+ trap:'ただし「円の価値が下がるから」は×。円高は、円の価値が上がること。'},
+{id:'k16',set:'k',no:'公民 ねらい 6',field:'環境',noEnd:true,
+ prompt:'「持続可能な社会」とは、どのような社会か。「将来の世代」の語を使って答えなさい。',
+ template:'（　　）の世代の幸福をそこなわず、（　　）の世代の要求も満たせる社会。',
+ groups:[
+  {label:'将来の世代（未来）',re:/将来|未来|次の世代|子孫/},
+  {label:'世代',re:/世代/},
+  {label:'現在の世代の要求を満たす',re:/現在|今|満た|開発|発展|要求|ニーズ/}],
+ model:'将来の世代の幸福をそこなわずに、現在の世代の要求も満たせる社会。',
+ point:'「将来の世代」と「現在の世代」の両方を入れる。SDGs（持続可能な開発目標）のもとになる考え方。',
+ trap:'ただし「環境を守る社会」だけだと不十分。将来の世代と現在の世代、両方の幸福を考える点が重要。'}
+];
+/*DATA_END*/
+
+const KEY='shakai-kijutsu-v1';
+const SETS=['r','g','k'];
+let store={};
+try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){store={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}}
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function figOf(q){return typeof q.fig==='function'?q.fig():q.fig==='tubes3()'?tubes3():q.fig==='seismo()'?seismo():q.fig}
+
+function evaluate(q,text){
+  const t=text.normalize('NFKC');
+  const res=q.groups.map(g=>({label:g.label,bonus:!!g.bonus,hit:g.re.test(t)}));
+  const end=/(から|ため)[。．.\s]*$/.test(t.trim());
+  return {res,end};
+}
+
+function cardHTML(q){
+  return '<article class="q" id="q-'+q.id+'" data-id="'+q.id+'">'
+   +'<div class="q-head"><span class="q-no">'+q.no+'</span><span class="q-field">'+q.field+'</span></div>'
+   +'<p class="q-text">'+q.prompt+'</p>'
+   +(q.fig?'<div class="fig">'+figOf(q)+'</div>':'')
+   +(q.table||'')
+   +'<label class="ans-label" for="a-'+q.id+'">あなたの答え</label>'
+   +'<textarea id="a-'+q.id+'" rows="3" placeholder="ここに書く。まちがっていてもOK。"></textarea>'
+   +'<div class="actions"><button class="btn primary" type="button" data-act="check">答え合わせ</button>'
+   +'<button class="btn" type="button" data-act="hint">書けないときは「型」を見る</button></div>'
+   +'<p class="hint" hidden><b>答えの型</b>'+esc(q.template)+'</p>'
+   +'<div class="result" hidden aria-live="polite"></div>'
+   +'</article>';
+}
+
+function showResult(q){
+  const card=document.getElementById('q-'+q.id);
+  const ta=card.querySelector('textarea');
+  const box=card.querySelector('.result');
+  const text=ta.value.trim();
+  if(text.length<4){
+    box.hidden=false;
+    box.innerHTML='<p class="note">まず自分のことばで書いてみよう。まちがっていてOK。書けないときは「型」を見てから書く。</p>';
+    return;
+  }
+  const {res,end}=evaluate(q,text);
+  const req=res.filter(r=>!r.bonus), got=req.filter(r=>r.hit).length;
+  const allReq=got===req.length;
+  const chips=res.map(r=>'<li class="chip '+(r.hit?'hit':'miss')+(r.bonus?' bonus':'')+'">'+(r.hit?'○ ':'× ')+esc(r.label)+(r.bonus?'（あると安心）':'')+'</li>').join('')
+    +(q.noEnd?'':'<li class="chip '+(end?'hit':'miss')+'">'+(end?'○ ':'× ')+'文末が「〜から」「〜ため」</li>');
+  const g=(store[q.id]&&store[q.id].grade)||'';
+  const gb=(v,l)=>'<button class="btn" type="button" data-grade="'+v+'" aria-pressed="'+(g===v)+'">'+l+'</button>';
+  box.hidden=false;
+  box.innerHTML=
+   '<h3 class="res-title">'+(allReq&&(end||q.noEnd)?'キーワードがそろっているよ':'足りないことばがあるよ')+'（'+got+' / '+req.length+'）</h3>'
+   +'<ul class="chips">'+chips+'</ul>'
+   +'<div class="model"><b>模範解答</b><p>'+esc(q.model)+'</p></div>'
+   +'<p class="note">'+esc(q.point)+'</p>'
+   +(q.why?'<div class="why"><b>'+esc(q.why[0])+'</b>'+q.why[1].map(s=>'<p>'+esc(s)+'</p>').join('')+'</div>':'')
+   +'<p class="note"><span class="mk">'+esc(q.trap)+'</span></p>'
+   +'<p class="note small">ことばの自動チェックは目安です。言いかえでも正解のことがあります。模範解答と見比べて、自分で採点してください。</p>'
+   +'<div class="grade"><span class="grade-label">自分で採点</span><div class="grade-row">'
+   +gb('ok','○ 書けた')+gb('close','△ おしい')+gb('ng','× 書けなかった')
+   +'<button class="btn" type="button" data-act="reset">書きなおす</button></div></div>';
+}
+
+function updateBars(){
+  SETS.forEach(s=>{
+    const list=Q.filter(q=>q.set===s);
+    const n=list.filter(q=>store[q.id]&&store[q.id].grade==='ok').length;
+    const bar=document.querySelector('[data-bar="'+s+'"]');
+    bar.querySelector('.bar-text').textContent='○ '+n+' / '+list.length;
+    bar.querySelector('.fill').style.width=(100*n/list.length)+'%';
+  });
+}
+
+function init(){
+  SETS.forEach(s=>{
+    document.querySelector('[data-list="'+s+'"]').innerHTML=Q.filter(q=>q.set===s).map(cardHTML).join('');
+  });
+  Q.forEach(q=>{
+    const st=store[q.id];
+    if(st&&st.text){
+      document.querySelector('#a-'+q.id).value=st.text;
+      if(st.checked) showResult(q);
+    }
+  });
+  updateBars();
+}
+
+document.addEventListener('click',e=>{
+  const tab=e.target.closest('.tab');
+  if(tab){
+    SETS.forEach(s=>{
+      const on=tab.dataset.set===s;
+      document.getElementById('tab-'+s).setAttribute('aria-selected',String(on));
+      document.getElementById('panel-'+s).hidden=!on;
+    });
+    return;
+  }
+  const card=e.target.closest('.q'); if(!card) return;
+  const q=Q.find(x=>x.id===card.dataset.id);
+  const act=e.target.closest('[data-act]');
+  const gr=e.target.closest('[data-grade]');
+  const ta=card.querySelector('textarea');
+  if(act&&act.dataset.act==='hint'){
+    const h=card.querySelector('.hint'); h.hidden=!h.hidden;
+  }else if(act&&act.dataset.act==='check'){
+    store[q.id]=Object.assign(store[q.id]||{}, {text:ta.value, checked:ta.value.trim().length>=4});
+    save(); showResult(q);
+  }else if(act&&act.dataset.act==='reset'){
+    delete store[q.id]; save(); ta.value=''; card.querySelector('.result').hidden=true; card.querySelector('.result').innerHTML=''; updateBars(); ta.focus();
+  }else if(gr){
+    store[q.id]=Object.assign(store[q.id]||{}, {text:ta.value, checked:true, grade:gr.dataset.grade});
+    save(); showResult(q); updateBars();
+  }
+});
+document.addEventListener('input',e=>{
+  if(e.target.matches('textarea')){
+    const card=e.target.closest('.q'); const id=card.dataset.id;
+    store[id]=Object.assign(store[id]||{}, {text:e.target.value}); save();
+  }
+});
+init();
+</script>
+
+</body>
+</html>
